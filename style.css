@@ -301,7 +301,11 @@ h1, h2, h3, p { margin: 0; }
   font-size: 15px;
   line-height: 20.5px;
 }
+.about-text p + p, .about-mais p { margin-top: 12px; }
 .split-about .btn { margin-top: 38px; width: 169px; }
+/* aberto, o texto completo não cabe na altura fixa da seção */
+.split-about.aberto { height: auto; }
+.split-about.aberto .split-text { padding-bottom: 60px; }
 
 /* =====================================================================
    NÓS ENTREGAMOS

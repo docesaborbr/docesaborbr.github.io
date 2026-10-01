@@ -23,6 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  const sobreToggle = document.getElementById("sobreToggle");
+  const sobreMais = document.getElementById("sobreMais");
+  sobreToggle.addEventListener("click", () => {
+    const aberto = sobreMais.hidden;
+    sobreMais.hidden = !aberto;
+    sobreToggle.closest(".split-about").classList.toggle("aberto", aberto);
+    sobreToggle.setAttribute("aria-expanded", String(aberto));
+    sobreToggle.textContent = aberto ? "Leia menos" : "Leia mais";
+  });
+
   /* ---------- Catálogo e carrinho ---------- */
   const WHATSAPP = "5547997417610";           // unico lugar para trocar o numero da loja
   const LINK_WHATSAPP = "https://wa.me/" + WHATSAPP;
