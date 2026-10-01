@@ -293,11 +293,19 @@ h1, h2, h3, p { margin: 0; }
 .split-lactose .btn { margin-top: 52px; width: 169px; height: 63px; }
 
 .split-about { height: 614px; background: var(--light); }
-.split-about .split-text { padding-top: 124px; }
+.split-about .split-text { padding-top: 64px; }
 .split-about .display { font-size: 69px; margin-top: 9px; }
+.about-avatar {
+  width: 120px;
+  height: 120px;
+  margin-top: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+}
 .about-text {
   width: 350px;
-  margin-top: 48px;
+  margin-top: 26px;
   font-size: 15px;
   line-height: 20.5px;
 }
@@ -913,11 +921,12 @@ body.sem-scroll { overflow: hidden; }
   .split-lactose .btn { margin-top: 3.85vw; }
 
   .split-about { height: 45.48vw; }
-  .split-about .split-text { padding-top: 9.19vw; }
+  .split-about .split-text { padding-top: 4.74vw; }
   .split-about .display { font-size: 5.11vw; margin-top: 0.67vw; }
+  .about-avatar { width: 8.89vw; height: 8.89vw; margin-top: 1.93vw; }
   .about-text {
     width: 25.93vw;
-    margin-top: 3.56vw;
+    margin-top: 1.93vw;
     font-size: clamp(11px, 1.11vw, 15px);
     line-height: 1.37;
   }
@@ -1002,7 +1011,8 @@ body.sem-scroll { overflow: hidden; }
   .split-lactose .btn { margin-top: 34px; }
   .split-about .btn { margin-top: 30px; }
   .split-photo { height: 74vw; max-height: 420px; }
-  .about-text { width: 100%; max-width: 420px; margin-top: 24px; font-size: 15px; }
+  .about-avatar { width: 110px; height: 110px; margin-top: 22px; }
+  .about-text { width: 100%; max-width: 420px; margin-top: 22px; font-size: 15px; }
 
 
   .delivery { padding: 54px 20px 58px; }
