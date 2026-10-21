@@ -36,7 +36,7 @@ export function Rodape() {
       </div>
 
       <p className="copyright">
-        ©2026 Doce Sabor. Desenvolvido e protegido por <a href="#">Patifes</a>
+        ©2026 Doce Sabor. Desenvolvido e protegido por Patifes
       </p>
     </footer>
   );
