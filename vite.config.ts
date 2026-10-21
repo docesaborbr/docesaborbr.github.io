@@ -47,7 +47,7 @@ function paginasDaLoja(api: string): Plugin {
           tag: "script",
           attrs: { type: "application/ld+json" },
           // "<" escapado: um texto com "</script>" não fecha o bloco antes da hora
-          children: JSON.stringify(dadosEstruturados()).replace(/</g, "\u003c"),
+          children: JSON.stringify(dadosEstruturados()).replace(/</g, "\\u003c"),
           injectTo: "head",
         });
       }
