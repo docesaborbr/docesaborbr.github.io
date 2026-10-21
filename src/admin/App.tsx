@@ -5,11 +5,13 @@ import { Card } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/sonner";
 import { emReais } from "@/lib/dinheiro";
 import type { ProdutoApi } from "@/lib/produto";
-import { SessaoExpirada, guardaToken, listarProdutos, urlImagem } from "./api";
+import { SessaoExpirada, acordarServidor, guardaToken, listarProdutos, urlImagem } from "./api";
+import { AvisoServidorAcordando } from "./AvisoServidorAcordando";
 import { ExcluirDialog } from "./ExcluirDialog";
 import { eyebrow, tituloPainel } from "./estilos";
 import { Login } from "./Login";
 import { ProdutoDialog } from "./ProdutoDialog";
+import { useDemora } from "./useDemora";
 
 /** Qual produto está no formulário: null é um novo. A `chave` remonta o formulário limpo. */
 type Edicao = { produto: ProdutoApi | null; chave: number };
@@ -20,6 +22,10 @@ export function App() {
   const [produtos, setProdutos] = useState<ProdutoApi[] | null>(null);
   const [edicao, setEdicao] = useState<Edicao | null>(null);
   const [excluindo, setExcluindo] = useState<ProdutoApi | null>(null);
+  const listaDemorando = useDemora(logado && produtos === null);
+
+  // Enquanto a dona digita a senha, o servidor já vai acordando.
+  useEffect(() => acordarServidor(), []);
 
   const sessaoExpirou = useCallback(() => {
     guardaToken.limpar();
@@ -96,7 +102,12 @@ export function App() {
               <Button onClick={() => setEdicao({ produto: null, chave: Date.now() })}>Adicionar produto</Button>
             </div>
 
-            {produtos === null && <p className="py-[30px] text-[15px]">Carregando…</p>}
+            {produtos === null && (
+              <div className="grid gap-2 py-[30px]">
+                <p className="text-[15px]">Carregando…</p>
+                {listaDemorando && <AvisoServidorAcordando />}
+              </div>
+            )}
             {produtos?.length === 0 && <p className="py-[30px] text-[15px]">Nenhum produto cadastrado ainda.</p>}
 
             <div className="grid gap-3">

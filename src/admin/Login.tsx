@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { entrar } from "./api";
+import { AvisoServidorAcordando } from "./AvisoServidorAcordando";
 import { campoTexto, eyebrow, rotulo, tituloPainel } from "./estilos";
+import { useDemora } from "./useDemora";
 
 type Props = { aviso: string; onEntrou: () => void };
 
@@ -14,6 +16,7 @@ export function Login({ aviso, onEntrou }: Props) {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const demorando = useDemora(enviando);
   const mensagem = erro || aviso;
 
   async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
@@ -76,6 +79,7 @@ export function Login({ aviso, onEntrou }: Props) {
             <Button type="submit" className="w-full" disabled={enviando}>
               {enviando ? "Entrando…" : "Entrar"}
             </Button>
+            {demorando && <AvisoServidorAcordando />}
           </CardContent>
         </form>
       </Card>

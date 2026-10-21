@@ -100,3 +100,10 @@ export async function excluirProduto(id: number): Promise<void> {
 }
 
 export const urlImagem = (produto: ProdutoApi): string | null => (produto.imagem ? API + produto.imagem : null);
+
+/** Só faz o servidor acordar; a resposta não importa. */
+export function acordarServidor(): void {
+  fetch(API + "/api/saude").catch(() => {
+    /* fora do ar: o login avisa quando for usado */
+  });
+}

@@ -1,0 +1,32 @@
+# Mantém a API do Render acordada no horário da loja.
+#
+# No plano gratuito o Render desliga o servidor depois de 15 minutos sem acesso, e
+# a primeira visita seguinte espera de 30 a 60 segundos ele religar. Chamando a API
+# a cada 10 minutos das 9h às 22h (horário de Brasília), quem abre o painel ou a
+# loja nesse período encontra o servidor pronto.
+#
+# São ~13 h por dia, ~400 h por mês — dentro das 750 h mensais grátis do Render.
+#
+# Limites do agendamento do GitHub, que valem saber:
+#   - em horários de pico ele pode atrasar alguns minutos, então de vez em quando
+#     o servidor ainda pode dormir;
+#   - em repositório público, o agendamento é pausado depois de 60 dias sem nenhum
+#     commit. Para reativar: aba Actions → "Manter API acordada" → Enable workflow.
+name: Manter API acordada
+
+on:
+  schedule:
+    # cron em UTC: 12h–00h UTC = 9h–21h59 em Brasília (UTC−3, sem horário de verão)
+    - cron: "*/10 0,12-23 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  chamar-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Chamar /api/saude
+        # o primeiro acesso depois de dormir pode levar até um minuto
+        run: curl --fail --silent --show-error --max-time 90 --retry 2 --retry-delay 10 https://doce-sabor-api.onrender.com/api/saude

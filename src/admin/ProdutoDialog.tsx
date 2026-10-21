@@ -7,7 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ProdutoApi } from "@/lib/produto";
 import { SessaoExpirada, salvarProduto, urlImagem } from "./api";
+import { AvisoServidorAcordando } from "./AvisoServidorAcordando";
 import { campoTexto, eyebrow, rotulo } from "./estilos";
+import { TAMANHO_MAXIMO, TIPOS_ACEITOS, problemaNaFoto, reduzirFoto } from "./foto";
+import { useDemora } from "./useDemora";
 
 type Props = {
   /** null cria um produto novo */
@@ -26,6 +29,7 @@ export function ProdutoDialog({ produto, onFechar, onSalvo, onSessaoExpirada }: 
   const [previaArquivo, setPreviaArquivo] = useState<string | null>(null);
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const demorando = useDemora(salvando);
 
   // a URL temporária da prévia segura o arquivo na memória até ser revogada
   useEffect(() => {
@@ -42,13 +46,20 @@ export function ProdutoDialog({ produto, onFechar, onSalvo, onSessaoExpirada }: 
     setErro("");
     setSalvando(true);
 
-    const dados = new FormData();
-    dados.append("nome", nome);
-    dados.append("descricao", descricao);
-    dados.append("preco", preco);
-    if (arquivo) dados.append("imagem", arquivo);
-
     try {
+      const dados = new FormData();
+      dados.append("nome", nome);
+      dados.append("descricao", descricao);
+      dados.append("preco", preco);
+      if (arquivo) {
+        const foto = await reduzirFoto(arquivo);
+        if (foto.size > TAMANHO_MAXIMO) {
+          setErro("A foto deve ter no máximo 5 MB.");
+          return;
+        }
+        dados.append("imagem", foto);
+      }
+
       await salvarProduto(produto?.id ?? null, dados);
       onSalvo(produto ? "Produto atualizado." : "Produto adicionado.");
     } catch (falha) {
@@ -121,14 +132,20 @@ export function ProdutoDialog({ produto, onFechar, onSalvo, onSessaoExpirada }: 
 
           <div className="grid gap-[7px]">
             <Label htmlFor="imagem" className={rotulo}>
-              Foto <span className="opacity-60">(JPG ou PNG, até 5 MB)</span>
+              Foto <span className="opacity-60">(JPG, PNG ou WebP)</span>
             </Label>
             <Input
               id="imagem"
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept={TIPOS_ACEITOS.join(",")}
               className={`${campoTexto} py-2 text-sm`}
-              onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const escolhido = e.target.files?.[0] ?? null;
+                const problema = escolhido && problemaNaFoto(escolhido);
+                setErro(problema || "");
+                setArquivo(problema ? null : escolhido);
+                if (problema) e.target.value = "";
+              }}
             />
           </div>
           {previa && (
@@ -149,6 +166,7 @@ export function ProdutoDialog({ produto, onFechar, onSalvo, onSessaoExpirada }: 
               {salvando ? "Salvando…" : "Salvar"}
             </Button>
           </div>
+          {demorando && <AvisoServidorAcordando />}
         </form>
       </DialogContent>
     </Dialog>
