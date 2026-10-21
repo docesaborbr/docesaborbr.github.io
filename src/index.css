@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Mesmo corte de src/loja/secoes.css. O max-[860px] do Tailwind seria "< 860px"
+   e deixaria a tela de exatamente 860px com seções de celular e modais de desktop. */
+@custom-variant celular (@media (max-width: 860px));
+
+/* O site não tem tema escuro. Sem isto o dark: dos componentes do shadcn seguiria o
+   modo escuro do sistema e mudaria a cor dos campos para quem usa celular no escuro. */
+@custom-variant dark (&:is(.dark *));
+
+/* As fontes vêm do Google Fonts, no <head> de cada página. */
+@theme inline {
+    --font-sans: "Inter", Helvetica, Arial, sans-serif;
+    --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-heading: var(--font-serif);
+
+    /* cores da marca, para usar direto (bg-rosa, text-marrom...) */
+    --color-marrom: var(--marrom);
+    --color-rosa: var(--rosa);
+    --color-dourado: var(--dourado);
+    --color-claro: var(--claro);
+
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Trocar um valor aqui muda a cor em toda a loja e no painel. */
+:root {
+    --marrom: #541F03;   /* texto e fundos escuros */
+    --rosa: #F9CFD9;     /* navegação, rodapé, modais e seções claras */
+    --dourado: #C9A227;  /* molduras dos botões e detalhes */
+    --claro: #F4F6F6;
+
+    --background: #FFFFFF;
+    --foreground: var(--marrom);
+    --card: #FFFFFF;
+    --card-foreground: var(--marrom);
+    --popover: var(--rosa);
+    --popover-foreground: var(--marrom);
+    --primary: var(--marrom);
+    --primary-foreground: var(--rosa);
+    --secondary: var(--claro);
+    --secondary-foreground: var(--marrom);
+    --muted: var(--rosa);
+    --muted-foreground: color-mix(in srgb, var(--marrom) 75%, transparent);
+    --accent: var(--dourado);
+    --accent-foreground: var(--marrom);
+    --destructive: #A3261B;
+    --border: color-mix(in srgb, var(--marrom) 18%, transparent);
+    --input: color-mix(in srgb, var(--marrom) 28%, transparent);
+    --ring: var(--dourado);
+    --radius: 0.5rem;
+}
+
+/* Títulos serifados com os eixos SOFT e WONK da Fraunces. */
+@utility font-display {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-variation-settings: "SOFT" 80, "WONK" 1;
+}
+
+@utility font-eyebrow {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-variation-settings: "SOFT" 80, "WONK" 1;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}

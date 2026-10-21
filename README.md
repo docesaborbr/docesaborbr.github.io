@@ -9,29 +9,44 @@ monta o carrinho e o pedido chega pronto no WhatsApp da loja.
 
 ## Como abrir
 
-Não tem instalação, build nem dependência. Clique duas vezes em `index.html`, ou
-arraste o arquivo para o navegador.
-
-Se precisar servir por HTTP (só é necessário se alguém adicionar algo que dependa
-de requisições, como `fetch`), rode dentro da pasta:
+O front-end é React + TypeScript, montado pelo Vite, com Tailwind e componentes do
+[shadcn/ui](https://ui.shadcn.com). Precisa do Node 20 ou mais novo:
 
 ```bash
-python -m http.server 8000     # depois acesse http://localhost:8000
+npm install
+npm run dev        # loja em http://localhost:8000, painel em /admin.html
+```
+
+Outros comandos:
+
+```bash
+npm test           # testes do carrinho e da mensagem do pedido (Vitest)
+npm run build      # confere os tipos e gera o site final em dist/
+npm run preview    # serve o dist/ para conferir o build
 ```
 
 ## Arquivos
 
 ```
-├── index.html    → a loja
-├── admin.html    → painel da dona da loja (login + produtos)
-├── style.css     → estilos das duas páginas, responsivo no final
-├── script.js     → menu mobile, rolagem suave, catálogo e carrinho
-├── admin.js      → login e CRUD de produtos
-├── config.js     → endereço da API (um lugar só, vale para as duas páginas)
-├── favicon.ico   → ícone do site
-├── render.yaml   → configuração do deploy da API no Render
-├── images/       → fotos do site
-└── backend/      → a API (Node + Express + PostgreSQL)
+├── index.html             → a loja (só o <head>; o conteúdo vem de src/loja)
+├── admin.html             → painel da dona da loja (login + produtos)
+├── src/
+│   ├── index.css          → tema: cores da marca, fontes e tokens do shadcn
+│   ├── config.ts          → endereço da API (vale para a loja e o painel)
+│   ├── components/ui/     → componentes do shadcn/ui (código nosso, pode editar)
+│   ├── components/icones.tsx  ícones de Instagram, WhatsApp e sacola
+│   ├── lib/               → formatação de preço e validação do que vem da API
+│   ├── loja/              → seções da página, menu, carrinho e regras do pedido
+│   │   ├── secoes.css     → layout das seções, ajustado em px/vw à mão
+│   │   ├── catalogo.ts    → lista de reserva e leitura do catálogo da API
+│   │   ├── carrinho.ts    → regras do carrinho e texto do WhatsApp (com testes)
+│   │   └── contato.ts     → WhatsApp, Instagram e endereço da loja
+│   └── admin/             → login, lista, formulário e exclusão de produtos
+├── public/                → copiado como está: favicon.ico e images/
+├── .github/workflows/     → build e publicação no GitHub Pages
+├── components.json        → configuração do shadcn/ui
+├── render.yaml            → configuração do deploy da API no Render
+└── backend/               → a API (Node + Express + PostgreSQL)
     ├── server.js         rotas, CORS, limites, tratamento de erro
     ├── db.js             conexão com o Postgres
     ├── auth.js           bcrypt, JWT e o middleware que barra quem não é admin
@@ -57,8 +72,7 @@ desatualizado.
 O site sozinho funciona (veja acima). Para mexer no painel da loja, são três terminais:
 
 **Em produção está tudo na nuvem:** a loja e o painel no GitHub Pages, a API no
-Render e o banco no Neon. O `config.js` aponta sempre para a API publicada — não
-há configuração de localhost.
+Render e o banco no Neon. O `src/config.ts` aponta para a API publicada.
 
 Para mexer no back-end na sua máquina (opcional), suba um banco e a API:
 
@@ -68,8 +82,9 @@ npm run db:dev     # Postgres local, sem instalar nada
 npm start          # a API em localhost:3000
 ```
 
-Nesse caso, aponte o `config.js` para `http://localhost:3000` enquanto testa e
-acrescente a origem local em `ORIGENS_PERMITIDAS` no `.env`.
+Nesse caso, crie na raiz um `.env.local` com `VITE_API_URL=http://localhost:3000`
+(ele não vai para o Git) e rode `npm run dev`. O Vite sobe em `http://localhost:8000`,
+que já é a origem que a API libera quando `ORIGENS_PERMITIDAS` não está definida.
 
 O `backend/.env` guarda a senha do banco, o segredo das sessões e a senha do
 administrador. **Ele nunca vai para o Git** — está no `.gitignore`. Use o
@@ -103,12 +118,12 @@ O `render.yaml` já descreve o serviço. No painel do Render: **New → Blueprin
 aponte para este repositório e preencha as variáveis marcadas como `sync: false`
 (`DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_SENHA`). O `JWT_SECRET` o Render gera sozinho.
 
-A URL do serviço fica em `config.js`. O banco é o Neon; a `DATABASE_URL` é colada
+A URL do serviço fica em `src/config.ts`. O banco é o Neon; a `DATABASE_URL` é colada
 no painel do Render e nunca entra no repositório.
 
 > No plano gratuito o servidor hiberna após 15 minutos parado e a primeira
 > requisição pode levar meio minuto. Por isso a loja abre com uma lista de sabores
-> de reserva (em `script.js`) e troca pelos dados reais quando a API responde —
+> de reserva (em `src/loja/catalogo.ts`) e troca pelos dados reais quando a API responde —
 > **a loja nunca aparece vazia**, mesmo com a API fora do ar.
 
 > Se a conexão com o banco falhar com erro de certificado, o provedor usa uma CA
@@ -154,10 +169,10 @@ Entrega em: Rua das Palmeiras, 320, apto 12 — Bucarein
 
 ### Número do WhatsApp
 
-Uma linha só, em `script.js`:
+Uma linha só, em `src/loja/contato.ts`:
 
-```js
-const WHATSAPP = "5547997417610";   // 55 + DDD + numero, sem espaco ou traco
+```ts
+export const WHATSAPP = "5547997417610"; // único lugar para trocar o número: 55 + DDD + número
 ```
 
 Os ícones de WhatsApp da página derivam dessa mesma constante, então não é preciso
@@ -169,11 +184,12 @@ mexer em mais nada — eles nunca vão apontar para um número diferente do carr
 adicionar, editar nome, descrição, preço e foto, ou excluir. Tudo que estiver
 cadastrado aparece na loja — não há controle de estoque.
 
-A lista abaixo, em `script.js`, é só a **reserva** usada enquanto a API não responde:
+A lista abaixo, em `src/loja/catalogo.ts`, é só a **reserva** usada enquanto a API
+não responde:
 
-```js
-const RESERVA = [
-  { id: "morango-creme", nome: "Morango com creme", preco: 15, estoque: null, img: "images/menu-morango-creme.jpg" },
+```ts
+export const RESERVA: Produto[] = [
+  { id: "morango-creme", nome: "Morango com creme", preco: 15, img: "/images/menu-morango-creme.jpg" },
   ...
 ];
 ```
@@ -183,41 +199,43 @@ primeiros segundos enquanto a API acorda.
 
 ### Endereço, horário e contato
 
-O endereço e o horário ficam na seção `.delivery` de `index.html` (procure por
-`delivery-bloco`). O telefone aparece também no rodapé, em `FALE COM A GENTE`.
+O horário e o restante do endereço ficam na seção `Entregamos` de
+`src/loja/Secoes.tsx`. A rua vem de `ENDERECO_LOJA`, em `src/loja/contato.ts`, a
+mesma usada na opção "Retirar na loja" do carrinho e na mensagem do pedido. O
+telefone aparece também no rodapé (`src/loja/Rodape.tsx`), em `FALE COM A GENTE`.
 
 ### Cores
 
-Todas as cores estão no topo de `style.css`, em variáveis:
+Todas as cores estão em `src/index.css`, em variáveis:
 
 ```css
 :root {
-  --brown: #541F03;   /* texto e fundos escuros */
-  --gold:  #C9A227;   /* molduras dos botões e detalhes */
-  --pink:  #F9CFD9;   /* navegação, rodapé e seções claras */
+    --marrom: #541F03;   /* texto e fundos escuros */
+    --rosa: #F9CFD9;     /* navegação, rodapé, modais e seções claras */
+    --dourado: #C9A227;  /* molduras dos botões e detalhes */
 }
 ```
 
-Trocar o valor ali muda a cor em toda a página de uma vez.
+Trocar o valor ali muda a cor na loja e no painel de uma vez. Os tokens do shadcn
+(`--primary`, `--accent`, `--border`...) logo abaixo apontam para essas cores, então
+os componentes acompanham.
 
 ---
 
 ## Publicação
 
-O site é servido pelo GitHub Pages a partir da branch `main`, na raiz do repositório.
 **Todo push para `main` atualiza o site no ar** em um ou dois minutos — não existe
-passo de deploy manual.
+passo de deploy manual. O workflow `.github/workflows/publicar-site.yml` instala as
+dependências, roda os testes, gera o `dist/` e publica no GitHub Pages. Se um teste
+falhar, o site no ar continua como estava.
 
-> **Antes de publicar mudanças em `script.js`, `admin.js` ou `config.js`, rode:**
->
-> ```bash
-> node versionar.js
-> ```
->
-> O GitHub Pages manda o navegador guardar esses arquivos por 10 minutos. O comando
-> põe um resumo do conteúdo na URL do script, então o navegador é obrigado a buscar
-> a versão nova na hora. Sem isso, quem já visitou a loja continua vendo o código
-> antigo por um tempo — foi o que fez um produto recém-cadastrado não aparecer.
+> **Configuração única:** em **Settings → Pages → Build and deployment**, a origem
+> (*Source*) precisa ser **GitHub Actions**. Com a origem antiga (*Deploy from a
+> branch*), o Pages publicaria o código-fonte cru e a página ficaria em branco.
+
+O GitHub Pages manda o navegador guardar os arquivos por 10 minutos. O build já
+resolve isso: os nomes dos arquivos em `dist/assets/` levam um resumo do conteúdo,
+então qualquer mudança gera um nome novo e o navegador é obrigado a buscá-lo.
 
 O repositório se chama `docesaborbr.github.io` de propósito: é esse nome que faz o
 GitHub servir o site em `docesaborbr.github.io` sem `/nome-do-repo/` no final.
@@ -231,6 +249,9 @@ Renomear o repositório quebra a URL.
 - **860px – 1349px** — o mesmo desenho encolhe proporcionalmente (medidas em `vw`).
 - **≤ 859px** — as colunas empilham, o menu vira sanduíche, as fotos que eram fundo
   passam a ser imagens no fluxo e o menu de sabores vira duas colunas.
+
+O layout das seções está em `src/loja/secoes.css`; os modais e o painel usam a
+variante `celular:` do Tailwind (definida em `src/index.css` com o mesmo corte).
 
 ## Tipografia
 

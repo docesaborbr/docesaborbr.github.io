@@ -1,0 +1,575 @@
+/* =====================================================================
+   Doce Sabor — layout das seções da loja (largura base: 1350px)
+
+   Fica fora das camadas do Tailwind de propósito: assim estas medidas, ajustadas
+   à mão contra a página de referência, vencem as utilidades padrão dos
+   componentes (ex.: a altura do Button) onde os dois se encontram.
+   Componentes interativos (botões, modais, carrinho) vêm do shadcn/ui.
+   ===================================================================== */
+
+:root {
+  --side: 44px;          /* margem lateral do conteúdo */
+}
+
+html { scroll-behavior: smooth; }
+
+/* O preflight do Tailwind põe line-height 1.5 na página inteira; as medidas
+   abaixo foram ajustadas com o padrão do navegador. */
+body { line-height: normal; }
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  color: var(--marrom);
+}
+.display-light { color: var(--claro); }
+
+.eyebrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--marrom);
+}
+.eyebrow-light { color: var(--claro); }
+
+/* =====================================================================
+   NAVEGAÇÃO
+   ===================================================================== */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--rosa);
+  height: 72px;
+  border-bottom: 1px solid var(--dourado);
+}
+.nav-inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 60px 0 var(--side);
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+}
+/* Cápsulas como o resto do site: em repouso, um contorno dourado discreto que
+   dá forma sem competir com a logo; ao passar o mouse, o dourado preenche. */
+.nav-links a {
+  padding: 8px 16px;
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  border-radius: 999px;
+  line-height: 1;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  background: var(--dourado);
+  border-color: var(--dourado);
+  color: var(--marrom);
+  text-decoration: none;
+}
+
+.nav-logo {
+  position: absolute;
+  left: calc(50% + 20px);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.nav-cart {
+  position: relative;
+  border-radius: 999px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: normal;
+  color: var(--marrom);
+  cursor: pointer;
+}
+.nav-cart svg { display: block; }
+.nav-cart-count {
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: 11px;
+  background: var(--dourado);
+  color: var(--marrom);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 21px;
+  text-align: center;
+}
+
+.nav-toggle {
+  border-radius: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 6px 0;
+  margin-right: 18px;
+  cursor: pointer;
+}
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--marrom);
+}
+
+/* =====================================================================
+   HERO
+   ===================================================================== */
+.hero {
+  position: relative;
+  height: 718px;
+  background: #FED1D8 url("/images/hero-capa.jpg") calc(50% - 50px) center / auto 100% no-repeat;
+  overflow: hidden;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(254, 209, 216, 0) 48%, rgba(254, 209, 216, 0.72) 82%, rgba(254, 209, 216, 0.88) 100%);
+}
+.hero-inner {
+  position: relative;
+  max-width: 1350px;
+  height: 100%;
+  margin: 0 auto;
+  z-index: 1;
+}
+.hero-title {
+  position: absolute;
+  left: 0;
+  top: 430px;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  font-size: 193px;
+  line-height: 1;
+  letter-spacing: -1.2px;
+  color: var(--marrom);
+}
+.hero-tag {
+  position: absolute;
+  left: var(--side);
+  bottom: 50px;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  font-size: 29.5px;
+  line-height: 1;
+  color: var(--marrom);
+}
+.hero-btn {
+  position: absolute;
+  right: 43px;
+  bottom: 43px;
+  width: 138px;
+  white-space: nowrap;
+  font-size: 13.5px;
+}
+
+/* =====================================================================
+   NOSSOS SABORES
+   ===================================================================== */
+.flavors {
+  position: relative;
+  height: 717px;
+  background: #E6E6DC url("/images/flavors-potes.jpg") center / auto 100% no-repeat;
+  text-align: center;
+  overflow: hidden;
+}
+.flavors .eyebrow { padding-top: 78px; }
+.flavors .display {
+  font-size: 69px;
+  margin-top: 16px;
+}
+.flavors-cups { display: none; }
+.flavors-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 585px;
+  width: auto;
+  height: 54px;
+  padding: 0 38px;
+  font-size: 15.5px;
+  white-space: nowrap;
+}
+
+/* =====================================================================
+   SEÇÕES DIVIDIDAS (Sem lactose / Sobre Nós)
+   ===================================================================== */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.split-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.split-photo { overflow: hidden; }
+.split-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.split-lactose { height: 613px; background: var(--rosa); }
+.split-lactose .split-text { padding-top: 212px; }
+.split-lactose .display { font-size: 69px; margin-top: 8px; }
+.split-lactose .secao-btn { margin-top: 52px; width: 169px; height: 63px; }
+
+.split-about { height: 614px; background: var(--claro); }
+.split-about .split-text { padding-top: 64px; }
+.split-about .display { font-size: 69px; margin-top: 9px; }
+.about-avatar {
+  width: 120px;
+  height: 120px;
+  margin-top: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--dourado);
+}
+.about-text {
+  width: 350px;
+  margin-top: 26px;
+  font-size: 15px;
+  line-height: 20.5px;
+}
+.about-text { text-align: justify; hyphens: auto; }
+.about-text p + p, .about-mais p { margin-top: 12px; }
+.split-about .secao-btn { margin-top: 38px; width: 169px; }
+/* aberto, o texto completo não cabe na altura fixa da seção */
+.split-about.aberto { height: auto; }
+.split-about.aberto .split-text { padding-bottom: 60px; }
+
+/* =====================================================================
+   NÓS ENTREGAMOS
+   ===================================================================== */
+.delivery {
+  background: var(--marrom);
+  text-align: center;
+  padding: 78px var(--side) 84px;
+}
+.delivery-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 34px;
+  max-width: 880px;
+  margin: 46px auto 0;
+}
+.delivery-bloco h3 {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--dourado);
+  margin-bottom: 12px;
+}
+.delivery-bloco p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--claro);
+}
+.delivery .display { font-size: 69px; margin-top: 7px; }
+.delivery .secao-btn {
+  margin-top: 48px;
+  width: 168px;
+  height: 42px;
+  font-size: 13.5px;
+  line-height: 1.25;
+}
+
+/* =====================================================================
+   GALERIA
+   ===================================================================== */
+.gallery {
+  display: grid;
+  grid-template-columns: 345fr 343fr 343fr 334fr;
+  height: 343px;
+}
+.gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =====================================================================
+   RODAPÉ
+   ===================================================================== */
+.footer {
+  position: relative;
+  background: var(--rosa);
+  height: 430px;
+  padding: 0 44px 0 37px;
+}
+.footer-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.footer-logo {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  font-size: 78px;
+  line-height: 1;
+  padding-top: 35px;
+}
+
+.footer-cols {
+  display: flex;
+  padding-top: 68px;
+}
+.footer-col { width: auto; }
+.footer-col h3 {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  margin-bottom: 14px;
+}
+.footer-col p {
+  font-size: 15px;
+  line-height: 21px;
+}
+
+.footer-legal { padding-top: 34px; }
+
+/* Os ícones sociais aparecem no topo e no rodapé com o mesmo desenho:
+   círculo cheio no marrom da marca, ícone em rosa. Vazados e pequenos eles
+   se perdiam no fundo. */
+.nav-social,
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-social a,
+.footer-social a {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--marrom);
+  color: var(--rosa);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+/* Sem flex:none o SVG era achatado pelo flex da navegação, virando um risco
+   de 4px dentro do círculo. O tamanho vem daqui, não do atributo do SVG. */
+.nav-social svg,
+.footer-social svg {
+  flex: none;
+  display: block;
+}
+.nav-social a { width: 46px; height: 46px; }
+.nav-social svg { width: 25px; height: 25px; }
+.footer-social a { width: 54px; height: 54px; }
+.footer-social svg { width: 29px; height: 29px; }
+.nav-social a:hover,
+.footer-social a:hover { background: var(--dourado); color: var(--marrom); }
+
+.nav-social { margin-left: 8px; }
+
+.copyright {
+  position: absolute;
+  left: 37px;
+  bottom: 11px;
+  font-size: 15px;
+}
+.copyright a { text-decoration: underline; }
+
+/* ---------- Retirada / Entrega ---------- */
+.pickup {
+  width: 580px;
+  margin-top: 41px;
+  background: var(--marrom);
+  border-radius: 6px;
+  padding: 40px 38px 44px;
+  color: var(--claro);
+}
+.pickup-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-variation-settings: "SOFT" 80, "WONK" 1;
+  font-size: 42px;
+  line-height: 1;
+  margin-bottom: 34px;
+  color: var(--dourado);
+}
+.pickup-list li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+.pickup-list li + li { margin-top: 22px; }
+.pickup-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dourado);
+}
+
+
+/* =====================================================================
+   RESPONSIVO
+   ===================================================================== */
+/* --- Abaixo de 1350px o layout encolhe proporcionalmente (base: 1350px) --- */
+@media (max-width: 1349px) {
+  .eyebrow { font-size: clamp(14px, 1.48vw, 20px); }
+
+  .hero { height: 53.19vw; }
+  .hero-title { top: 31.86vw; font-size: 14.28vw; letter-spacing: -0.09vw; }
+  .hero-tag { left: 3.26vw; bottom: 3.7vw; font-size: clamp(17px, 2.19vw, 30px); }
+  .hero-btn { right: 3.19vw; bottom: 2.96vw; }
+
+  .flavors { height: 53.11vw; }
+  .flavors .eyebrow { padding-top: 5.78vw; }
+  .flavors .display { font-size: 5.11vw; margin-top: 1.19vw; }
+  .flavors-btn { top: auto; bottom: 4.5vw; }
+
+  .split-lactose { height: 45.41vw; }
+  .split-lactose .split-text { padding-top: 15.7vw; }
+  .split-lactose .display { font-size: 5.11vw; margin-top: 0.59vw; }
+  .split-lactose .secao-btn { margin-top: 3.85vw; }
+
+  .split-about { height: 45.48vw; }
+  .split-about .split-text { padding-top: 4.74vw; }
+  .split-about .display { font-size: 5.11vw; margin-top: 0.67vw; }
+  .about-avatar { width: 8.89vw; height: 8.89vw; margin-top: 1.93vw; }
+  .about-text {
+    width: 25.93vw;
+    margin-top: 1.93vw;
+    font-size: clamp(11px, 1.11vw, 15px);
+    line-height: 1.37;
+  }
+  .split-about .secao-btn { margin-top: 2.81vw; }
+
+  .delivery { padding: 6.3vw var(--side) 6.8vw; }
+  .delivery-info { gap: 2.5vw; margin-top: 3.4vw; }
+  .delivery-bloco p { font-size: clamp(14px, 1.33vw, 18px); }
+  .delivery .display { font-size: 5.11vw; margin-top: 0.52vw; }
+  .delivery .secao-btn { margin-top: 3.41vw; }
+
+  .gallery { height: 25.41vw; }
+
+  .footer-logo { font-size: 5.78vw; }
+  .footer-col { width: 16.15vw; }
+}
+
+/* --- O rodapé empilha antes que a caixa de e-mail encoste nas colunas --- */
+@media (max-width: 1239px) {
+  .footer { height: auto; padding-bottom: 24px; }
+  .footer-inner { flex-direction: column; gap: 34px; }
+  .footer-logo { font-size: clamp(46px, 5.78vw, 78px); }
+  .footer-col { width: auto; min-width: 200px; }
+  .footer-cols { gap: 30px; }
+  .pickup { width: 100%; max-width: 580px; margin-top: 0; }
+  .copyright { position: static; padding-top: 44px; }
+}
+
+/* --- Celular e tablets estreitos: o mesmo desenho, empilhado --- */
+@media (max-width: 860px) {
+
+  .nav-inner { padding: 0 20px; }
+  .nav-toggle { display: flex; }
+  /* no celular os links vão para a gaveta lateral (Sheet) */
+  .nav-links { display: none; }
+  .nav-cart span:not(.nav-cart-count) { display: none; }
+  .nav-logo { left: 50%; font-size: 26px; }
+
+  .hero { height: 78vw; max-height: 460px; background-position: center center; }
+  .hero-title { top: auto; bottom: 99px; font-size: 16vw; }
+  .hero-tag {
+    left: 0;
+    width: 100%;
+    bottom: 68px;
+    text-align: center;
+    font-size: 19px;
+  }
+  .hero-btn {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 16px;
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .flavors { height: auto; padding: 46px 20px 54px; background: #EAE8E1; }
+  .flavors-cups { display: block; width: 100%; margin: 26px 0 30px; }
+  .flavors .eyebrow { padding-top: 0; font-size: 17px; }
+  .flavors .display { font-size: 34px; margin-top: 12px; }
+  .flavors-btn { position: static; transform: none; margin-top: 26px; width: 100%; padding: 0 20px; }
+
+  .split { grid-template-columns: 1fr; }
+  .split-lactose, .split-about { height: auto; }
+  .split-lactose .split-text,
+  .split-about .split-text { padding: 54px 20px 58px; }
+  .split-lactose .display,
+  .split-about .display { font-size: 34px; margin-top: 10px; }
+  .split-lactose .secao-btn { margin-top: 34px; }
+  .split-about .secao-btn { margin-top: 30px; }
+  .split-photo { height: 74vw; max-height: 420px; }
+  .about-avatar { width: 110px; height: 110px; margin-top: 22px; }
+  .about-text { width: 100%; max-width: 420px; margin-top: 22px; font-size: 15px; }
+
+
+  .delivery { padding: 54px 20px 58px; }
+  .delivery-info { grid-template-columns: 1fr; gap: 26px; margin-top: 30px; }
+  .delivery-bloco p { font-size: 16px; }
+  .delivery .display { font-size: 34px; margin-top: 10px; }
+  .delivery .secao-btn { margin-top: 30px; }
+
+  .gallery { grid-template-columns: repeat(2, 1fr); height: auto; }
+  .gallery img { aspect-ratio: 1 / 1; height: auto; }
+
+
+  .footer { padding: 0 20px 24px; }
+  .footer-logo { font-size: 46px; padding-top: 42px; }
+  .footer-cols { flex-wrap: wrap; gap: 26px; padding-top: 34px; }
+  .footer-col { min-width: 150px; }
+  .footer-legal { padding-top: 28px; }
+  .copyright { font-size: 13px; padding-top: 34px; }
+  .pickup { padding: 28px 22px 32px; }
+  .pickup-title { font-size: 32px; margin-bottom: 24px; }
+  .pickup-list li { font-size: 17px; }
+  .pickup-list li + li { margin-top: 18px; }
+}
