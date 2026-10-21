@@ -20,38 +20,41 @@ npm run dev        # loja em http://localhost:8000, painel em /admin.html
 Outros comandos:
 
 ```bash
-npm test           # testes do carrinho e da mensagem do pedido (Vitest)
-npm run build      # confere os tipos e gera o site final em dist/
+npm test           # testes do carrinho, do pedido, das fotos e da página gerada (Vitest)
+npm run build      # confere os tipos, gera o site em dist/ e pré-renderiza a loja
 npm run preview    # serve o dist/ para conferir o build
+node scripts/otimizar-imagens.mjs   # depois de trocar uma foto (veja "Fotos do site")
 ```
 
 ## Arquivos
 
 ```
-├── index.html             → a loja (só o <head>; o conteúdo vem de src/loja)
+├── index.html             → a loja (o conteúdo vem de src/loja e é pré-renderizado no build)
 ├── admin.html             → painel da dona da loja (login + produtos)
 ├── src/
 │   ├── index.css          → tema: cores da marca, fontes e tokens do shadcn
 │   ├── config.ts          → endereço da API (vale para a loja e o painel)
 │   ├── components/ui/     → componentes do shadcn/ui (código nosso, pode editar)
-│   ├── components/icones.tsx  ícones de Instagram, WhatsApp e sacola
 │   ├── lib/               → formatação de preço e validação do que vem da API
 │   ├── loja/              → seções da página, menu, carrinho e regras do pedido
-│   │   ├── secoes.css     → layout das seções, ajustado em px/vw à mão
+│   │   ├── contato.ts     → dados da loja: WhatsApp, endereço, horário, pagamento
 │   │   ├── catalogo.ts    → lista de reserva e leitura do catálogo da API
 │   │   ├── carrinho.ts    → regras do carrinho e texto do WhatsApp (com testes)
-│   │   └── contato.ts     → WhatsApp, Instagram e endereço da loja
-│   └── admin/             → login, lista, formulário e exclusão de produtos
-├── public/                → copiado como está: favicon.ico e images/
-├── .github/workflows/     → build e publicação no GitHub Pages
+│   │   ├── Foto.tsx       → fotos em AVIF/WebP no tamanho certo (fotos.json)
+│   │   ├── servidor.tsx   → gera o HTML da loja no build
+│   │   └── secoes.css     → layout das seções, ajustado em px/vw à mão
+│   └── admin/             → login, lista, formulário, ordem, esgotado e destaque
+├── public/                → copiado como está: favicon, fotos, fontes, robots e sitemap
+├── scripts/               → otimizar as fotos e pré-renderizar a loja
+├── .github/workflows/     → publicação no GitHub Pages e o "manter API acordada"
 ├── components.json        → configuração do shadcn/ui
 ├── render.yaml            → configuração do deploy da API no Render
 └── backend/               → a API (Node + Express + PostgreSQL)
     ├── server.js         rotas, CORS, limites, tratamento de erro
-    ├── db.js             conexão com o Postgres
+    ├── db.js             conexão com o Postgres e transações
     ├── auth.js           bcrypt, JWT e o middleware que barra quem não é admin
-    ├── routes/produtos.js CRUD e tratamento da imagem
-    ├── schema.sql        tabelas
+    ├── routes/produtos.js CRUD, esgotado, destaque, ordem e tratamento da imagem
+    ├── schema.sql        tabelas (roda em toda subida; seguro sobre dados existentes)
     ├── scripts/          criar-admin e o Postgres de desenvolvimento
     └── tests/            testes de integração
 ```
@@ -60,16 +63,31 @@ A página tem estas seções, nesta ordem: navegação, hero, Nossos Sabores,
 O Melhor Bolo de Pote, Sobre Nós, Nós Entregamos (endereço, horário e forma de
 retirada), galeria e rodapé.
 
-O endereço aparece **num lugar só**, na faixa marrom "Nós Entregamos", alcançável
-pelo link "Onde estamos" do menu. Repetir esse dado em vários cantos cria trabalho
-de manutenção e faz o cliente duvidar de qual está certo quando um deles ficar
-desatualizado.
+O endereço aparece **num lugar só** na página, na faixa marrom "Nós Entregamos",
+alcançável pelo link "Onde estamos" do menu. Repetir esse dado em vários cantos cria
+trabalho de manutenção e faz o cliente duvidar de qual está certo quando um deles
+ficar desatualizado.
+
+---
+
+## Painel da loja
+
+Em `/admin.html`, depois do login, cada sabor tem:
+
+- **Setas ↑ ↓** — mudam a ordem em que os sabores aparecem no cardápio.
+- **Esgotado hoje** — o sabor continua no cardápio, apagado e sem o botão de
+  adicionar. **No dia seguinte ele volta sozinho**, sem precisar desmarcar. Quem já
+  tinha esse sabor num carrinho salvo vê um aviso e ele fica fora do pedido.
+- **Sabor da semana** — o sabor abre o menu com um selo dourado. Só um por vez:
+  marcar outro tira o destaque do anterior.
+- **Editar** e **Excluir**.
+
+A foto escolhida é reduzida no próprio celular antes do envio (JPG, PNG ou WebP);
+o servidor ainda a recorta em 600×600.
 
 ---
 
 ## Rodando com o back-end
-
-O site sozinho funciona (veja acima). Para mexer no painel da loja, são três terminais:
 
 **Em produção está tudo na nuvem:** a loja e o painel no GitHub Pages, a API no
 Render e o banco no Neon. O `src/config.ts` aponta para a API publicada.
@@ -86,9 +104,9 @@ Nesse caso, crie na raiz um `.env.local` com `VITE_API_URL=http://localhost:3000
 (ele não vai para o Git) e rode `npm run dev`. O Vite sobe em `http://localhost:8000`,
 que já é a origem que a API libera quando `ORIGENS_PERMITIDAS` não está definida.
 
-O `backend/.env` guarda a senha do banco, o segredo das sessões e a senha do
-administrador. **Ele nunca vai para o Git** — está no `.gitignore`. Use o
-`.env.example` como molde.
+A API lê do `backend/.env`: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_EMAIL` e
+`ADMIN_SENHA` (e, se preciso, `ORIGENS_PERMITIDAS`). **Esse arquivo nunca vai para
+o Git** — está no `.gitignore`.
 
 ### Esqueceu a senha do painel?
 
@@ -106,7 +124,8 @@ Localmente, o mesmo se faz por comando:
 cd backend && npm run criar-admin dona@docesabor.com.br "uma senha forte"
 ```
 
-Os testes sobem um Postgres de verdade e exercitam login, autorização e upload:
+Os testes sobem um Postgres de verdade e exercitam login, autorização, upload,
+esgotado, destaque, ordem e a migração do banco:
 
 ```bash
 cd backend && npm test
@@ -118,13 +137,24 @@ O `render.yaml` já descreve o serviço. No painel do Render: **New → Blueprin
 aponte para este repositório e preencha as variáveis marcadas como `sync: false`
 (`DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_SENHA`). O `JWT_SECRET` o Render gera sozinho.
 
-A URL do serviço fica em `src/config.ts`. O banco é o Neon; a `DATABASE_URL` é colada
-no painel do Render e nunca entra no repositório.
+A URL do serviço fica em `src/api-padrao.ts`. O banco é o Neon; a `DATABASE_URL` é
+colada no painel do Render e nunca entra no repositório. **As fotos dos produtos
+ficam no banco**, não no disco do Render (que é apagado a cada deploy) — nada se
+perde quando o servidor reinicia.
 
-> No plano gratuito o servidor hiberna após 15 minutos parado e a primeira
-> requisição pode levar meio minuto. Por isso a loja abre com uma lista de sabores
-> de reserva (em `src/loja/catalogo.ts`) e troca pelos dados reais quando a API responde —
-> **a loja nunca aparece vazia**, mesmo com a API fora do ar.
+> **O servidor grátis dorme** após 15 minutos parado, e a primeira requisição
+> seguinte leva até um minuto. Três coisas cuidam disso:
+>
+> - O workflow `.github/workflows/manter-api-acordada.yml` chama a API a cada 10
+>   minutos das 9h às 22h (horário de Brasília) — cerca de 400 h por mês, dentro
+>   das 750 h grátis do Render. O GitHub pausa agendamentos depois de 60 dias sem
+>   commit no repositório; para reativar: aba **Actions → Manter API acordada →
+>   Enable workflow**. Em horário de pico o agendamento pode atrasar uns minutos.
+> - A loja abre com uma lista de sabores de reserva (em `src/loja/catalogo.ts`) e
+>   troca pelos dados reais quando a API responde — **a loja nunca aparece vazia**.
+>   O que o cliente já pôs no carrinho passa para o sabor de mesmo nome.
+> - O painel acorda o servidor assim que abre e avisa "Conectando ao servidor…"
+>   quando ele demora.
 
 > Se a conexão com o banco falhar com erro de certificado, o provedor usa uma CA
 > própria: coloque o certificado na variável `DATABASE_CA_CERT`. Não desative a
@@ -136,10 +166,10 @@ no painel do Render e nunca entra no repositório.
 
 O catálogo vem da API; o carrinho e o fechamento acontecem no navegador:
 
-1. O cliente clica em **Explore o menu** (ou em qualquer botão "Faça seu pedido pelo
-   WhatsApp") e vê os sabores disponíveis.
+1. O cliente clica em **Escolher meus sabores** (ou em qualquer botão "Faça seu
+   pedido pelo WhatsApp") e vê os sabores, com o sabor da semana primeiro.
 2. Cada **Adicionar** soma uma unidade. O contador dourado na barra de navegação
-   acompanha.
+   acompanha. Sabor esgotado hoje não pode ser adicionado.
 3. Em **Ir para o carrinho** ele revisa itens, quantidades e total.
 4. **Finalizar compra** pergunta como ele quer receber:
    - **Retirar na loja** manda o pedido na hora, com o endereço da loja na mensagem.
@@ -167,42 +197,58 @@ Entrega em: Rua das Palmeiras, 320, apto 12 — Bucarein
 
 ## O que você provavelmente vai querer mudar
 
-### Número do WhatsApp
+### Dados da loja: WhatsApp, endereço, horário, pagamento
 
-Uma linha só, em `src/loja/contato.ts`:
+Tudo num objeto só, `LOJA`, em `src/loja/contato.ts`:
 
 ```ts
-export const WHATSAPP = "5547997417610"; // único lugar para trocar o número: 55 + DDD + número
+export const LOJA = {
+  nome: "Doce Sabor",
+  site: "https://docesaborbr.github.io/",
+  whatsapp: "5547997417610", // 55 + DDD + número, sem espaço ou traço
+  instagram: "https://www.instagram.com/",
+  endereco: { rua: "Rua do Príncipe, 500", bairro: "Centro", cidade: "Joinville", estado: "SC", cep: "89201-000" },
+  horario: { abre: 10, fecha: 22 }, // todos os dias
+  pagamentos: ["Pix", "Cartão", "Dinheiro"],
+};
 ```
 
-Os ícones de WhatsApp da página derivam dessa mesma constante, então não é preciso
-mexer em mais nada — eles nunca vão apontar para um número diferente do carrinho.
+Daqui saem o rodapé, a seção "Nós Entregamos", os ícones de WhatsApp, a opção
+"Retirar na loja" do carrinho, a mensagem do pedido e os dados que o Google lê
+(veja "Google"). Trocou aqui, trocou em todo lugar.
 
 ### Sabores e preços
 
-**Com o back-end no ar, isso se faz pelo painel** (`/admin.html`), sem tocar em código:
-adicionar, editar nome, descrição, preço e foto, ou excluir. Tudo que estiver
-cadastrado aparece na loja — não há controle de estoque.
+**Com o back-end no ar, isso se faz pelo painel** (`/admin.html`), sem tocar em
+código — veja "Painel da loja".
 
 A lista abaixo, em `src/loja/catalogo.ts`, é só a **reserva** usada enquanto a API
 não responde:
 
 ```ts
 export const RESERVA: Produto[] = [
-  { id: "morango-creme", nome: "Morango com creme", preco: 15, img: "/images/menu-morango-creme.jpg" },
+  { id: "morango-creme", nome: "Morango com creme", preco: 15, img: "/images/menu-morango-creme-440.webp", esgotado: false, destaque: false },
   ...
 ];
 ```
 
-Vale mantê-la parecida com o catálogo real, já que é ela que o cliente vê nos
-primeiros segundos enquanto a API acorda.
+Vale mantê-la com os **mesmos nomes** do catálogo real: é pelo nome que o carrinho
+montado nos primeiros segundos passa para o produto de verdade.
 
-### Endereço, horário e contato
+### Fotos do site
 
-O horário e o restante do endereço ficam na seção `Entregamos` de
-`src/loja/Secoes.tsx`. A rua vem de `ENDERECO_LOJA`, em `src/loja/contato.ts`, a
-mesma usada na opção "Retirar na loja" do carrinho e na mensagem do pedido. O
-telefone aparece também no rodapé (`src/loja/Rodape.tsx`), em `FALE COM A GENTE`.
+As fotos ficam em `public/images` (o JPEG original). Para cada uma, o site usa
+versões AVIF e WebP em algumas larguras, listadas em `src/loja/fotos.json` — o
+navegador baixa só a menor que dá conta da tela. Depois de trocar ou acrescentar uma
+foto (mesmo nome de arquivo), rode:
+
+```bash
+node scripts/otimizar-imagens.mjs
+```
+
+A foto do fundo de "Nossos Sabores" (`flavors-potes`) é referenciada direto em
+`src/loja/secoes.css`. A `preview.jpg` é a imagem que aparece quando o link é
+compartilhado no WhatsApp.
 
 ### Cores
 
@@ -219,6 +265,37 @@ Todas as cores estão em `src/index.css`, em variáveis:
 Trocar o valor ali muda a cor na loja e no painel de uma vez. Os tokens do shadcn
 (`--primary`, `--accent`, `--border`...) logo abaixo apontam para essas cores, então
 os componentes acompanham.
+
+---
+
+## Google
+
+O site já entrega ao Google o que dá para fazer pelo código:
+
+- **Dados estruturados** do tipo `Bakery` (endereço, horário, telefone, pagamento),
+  gerados no build a partir de `LOJA` e colocados no `<head>`. Para conferir:
+  [Rich Results Test](https://search.google.com/test/rich-results).
+- **`robots.txt`**, **`sitemap.xml`** e **link canônico**.
+- **HTML pronto**: a loja é pré-renderizada no build, então o conteúdo está no HTML
+  mesmo sem rodar o JavaScript.
+
+O que depende de vocês (todos grátis, com a conta Google da loja):
+
+- **Perfil da Empresa no Google** (business.google.com) — é o que faz a loja aparecer
+  no Maps e em buscas como "bolo de pote Joinville".
+- **Google Search Console** — cadastrar o site e enviar
+  `https://docesaborbr.github.io/sitemap.xml`. Para verificar a propriedade pelo
+  método "tag HTML", me passem a tag e ela entra no `index.html`.
+- **Métricas sem banner de cookies** — Cloudflare Web Analytics ou GoatCounter.
+  Criada a conta, o código entra no site (e na política de segurança, abaixo).
+
+### Domínio próprio
+
+O GitHub Pages aceita domínio próprio com HTTPS grátis. Ao registrar um (ex.: no
+Registro.br): configure o DNS conforme a documentação do GitHub Pages, crie
+`public/CNAME` com o domínio e troque `docesaborbr.github.io` por ele em `LOJA.site`,
+no `index.html` (link canônico e tags `og:`), em `public/robots.txt`,
+`public/sitemap.xml` e em `ORIGENS_PERMITIDAS` no Render.
 
 ---
 
@@ -241,13 +318,18 @@ O repositório se chama `docesaborbr.github.io` de propósito: é esse nome que 
 GitHub servir o site em `docesaborbr.github.io` sem `/nome-do-repo/` no final.
 Renomear o repositório quebra a URL.
 
+Para medir a velocidade, use o [PageSpeed Insights](https://pagespeed.web.dev/) com
+o endereço do site.
+
 ---
 
 ## Responsivo
 
 - **≥ 1350px** — medidas fixas em pixels.
 - **860px – 1349px** — o mesmo desenho encolhe proporcionalmente (medidas em `vw`).
-- **≤ 859px** — as colunas empilham, o menu vira sanduíche, as fotos que eram fundo
+  Até 1100px os ícones do Instagram e do WhatsApp saem do topo (continuam no rodapé),
+  senão passariam por cima do logo.
+- **≤ 860px** — as colunas empilham, o menu vira sanduíche, as fotos que eram fundo
   passam a ser imagens no fluxo e o menu de sabores vira duas colunas.
 
 O layout das seções está em `src/loja/secoes.css`; os modais e o painel usam a
@@ -255,8 +337,12 @@ variante `celular:` do Tailwind (definida em `src/index.css` com o mesmo corte).
 
 ## Tipografia
 
-Duas fontes do Google Fonts: **Fraunces** (com os eixos `SOFT` e `WONK` ativados) nos
-títulos serifados e **Inter** nos textos, botões e navegação.
+**Fraunces** nos títulos serifados e **Inter** nos textos, botões e navegação,
+servidas pelo próprio site (`public/fonts`), só com o alfabeto latino e o que a página
+usa: a Fraunces já vem com os eixos `SOFT` 80 e `WONK` 1 aplicados e pesos de 400 a
+700; a Inter, de 400 a 600. Isso deixa os arquivos com metade do tamanho e evita
+pedir fonte ao Google a cada visita. Se um dia precisar de outro peso, as fontes
+precisam ser geradas de novo a partir do Google Fonts.
 
 ---
 
@@ -267,17 +353,26 @@ Decisões que valem conhecer antes de mexer:
 - **Senhas** são guardadas só como hash bcrypt (custo 12). A senha em texto nunca
   toca o banco.
 - **Autorização é no servidor.** Esconder o botão no navegador não protege nada:
-  toda rota que cria, altera ou apaga passa pelo middleware `exigirAdmin`.
+  toda rota que cria, altera, reordena ou apaga passa pelo middleware `exigirAdmin`.
 - **Login** devolve sempre a mesma mensagem para e-mail inexistente e senha errada,
   e leva o mesmo tempo nos dois casos — senão dá para descobrir quais e-mails existem.
+  Há limite de 10 tentativas a cada 15 minutos.
 - **A sessão** é um JWT de 8 horas guardado em `sessionStorage`, enviado no cabeçalho
   `Authorization`. Não usa cookie, então não há superfície de CSRF.
-- **Upload de imagem:** o arquivo é reprocessado pelo `sharp`, o que valida que é
+- **Política de segurança (CSP)** nas páginas publicadas, como `<meta>` (o GitHub
+  Pages não deixa configurar cabeçalhos): só roda script do próprio site e só se fala
+  com a API. É o que impede um script injetado de levar o token do painel. Ao
+  acrescentar um serviço de fora (métricas, por exemplo), ele precisa entrar na
+  política em `vite.config.ts`.
+- **Upload de imagem:** o navegador reduz a foto e recusa formato errado, mas quem
+  decide é o servidor: o arquivo é reprocessado pelo `sharp`, o que valida que é
   mesmo uma imagem (extensão e Content-Type se falsificam), descarta qualquer coisa
   embutida nos metadados e padroniza o tamanho. Nada é gravado em disco com nome
   vindo do cliente.
 - **SQL** é sempre parametrizado. No `UPDATE` os nomes de coluna vêm de uma lista
   fixa no código, nunca do corpo da requisição.
+- **O que vem da API é validado no navegador** antes de usar (`src/lib/produto.ts`):
+  item fora do formato é descartado e a imagem só pode ser um caminho da própria API.
 - **CORS** aceita só as origens listadas em `ORIGENS_PERMITIDAS`. Nunca `*`.
 - **Erros** chegam genéricos ao cliente; o detalhe fica no log do servidor.
 
@@ -293,5 +388,5 @@ Decisões que valem conhecer antes de mexer:
 - **Preços não são confiáveis no servidor** — ver o aviso acima.
 - O bloco "Peça seu Doce Sabor" no rodapé é informativo: não há formulário por trás.
 - O link do Instagram aponta para `instagram.com` genérico, à espera do perfil da loja.
-- A página não tem tags Open Graph nem favicon, então o link compartilhado no WhatsApp
-  aparece sem imagem e sem descrição.
+- Os alertas do `npm audit` (dependência `braces`) vêm da ferramenta de linha de
+  comando do shadcn, usada só para adicionar componentes; ela não vai para o site.
