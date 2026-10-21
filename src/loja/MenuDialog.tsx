@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { emReais } from "@/lib/dinheiro";
+import { cn } from "@/lib/utils";
 import { totalItens, totalValor, type Carrinho } from "./carrinho";
-import type { Produto } from "./catalogo";
+import { ordenarParaMenu, type Produto } from "./catalogo";
 
 /** Caixa comum ao menu e ao carrinho: rosa com moldura dourada, tela cheia no celular. */
 export const caixaModal =
@@ -40,9 +42,21 @@ export function MenuDialog({ aberto, onOpenChange, produtos, carrinho, onMudar, 
         </DialogHeader>
 
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-5 celular:grid-cols-2 celular:gap-3.5">
-          {produtos.map((p) => (
+          {ordenarParaMenu(produtos).map((p) => (
             <li key={p.id}>
-              <Card className="h-full items-center gap-0 rounded-md px-3.5 pt-4 pb-[18px] text-center ring-0">
+              <Card
+                className={cn(
+                  // o Card do shadcn tira a margem de cima quando a foto é o primeiro filho
+                  // (foto de capa); aqui a foto fica emoldurada, como no desenho original
+                  "relative h-full items-center gap-0 rounded-md px-3.5 pt-4 pb-[18px] text-center ring-0 has-[>img:first-child]:pt-4 *:[img:first-child]:rounded-t-sm",
+                  p.destaque && "ring-2 ring-dourado",
+                )}
+              >
+                {p.destaque && (
+                  <Badge className="absolute top-2.5 left-2.5 z-10 h-6 bg-dourado px-2.5 text-[12px] text-marrom">
+                    Sabor da semana
+                  </Badge>
+                )}
                 {p.img ? (
                   <img
                     src={p.img}
@@ -50,7 +64,7 @@ export function MenuDialog({ aberto, onOpenChange, produtos, carrinho, onMudar, 
                     loading="lazy"
                     width={440}
                     height={440}
-                    className="aspect-square w-full rounded-sm object-cover"
+                    className={cn("aspect-square w-full rounded-sm object-cover", p.esgotado && "opacity-45 grayscale")}
                   />
                 ) : (
                   <div className="flex aspect-square w-full items-center justify-center rounded-sm bg-rosa text-[13px] opacity-70">
@@ -60,7 +74,13 @@ export function MenuDialog({ aberto, onOpenChange, produtos, carrinho, onMudar, 
                 <h3 className="mt-3.5 font-display text-[19px] leading-tight celular:text-base">{p.nome}</h3>
                 <p className="mt-1.5 mb-3.5 text-[15px]">{emReais(p.preco)}</p>
                 <div className="mt-auto w-full">
-                  <ControleQuantidade produto={p} quantidade={carrinho.get(p.id) ?? 0} onMudar={onMudar} />
+                  {p.esgotado ? (
+                    <Button variant="outline" disabled className="h-[38px] w-full text-[13.5px]">
+                      Esgotado hoje
+                    </Button>
+                  ) : (
+                    <ControleQuantidade produto={p} quantidade={carrinho.get(p.id) ?? 0} onMudar={onMudar} />
+                  )}
                 </div>
               </Card>
             </li>

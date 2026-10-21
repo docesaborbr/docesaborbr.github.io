@@ -47,6 +47,7 @@ export function App() {
         onOpenChange={fecharSe}
         produtos={loja.produtos}
         carrinho={loja.carrinho}
+        esgotados={loja.esgotados}
         pedidoEnviado={loja.pedidoEnviado}
         onMudar={loja.mudar}
         onEsvaziar={loja.esvaziar}

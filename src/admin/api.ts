@@ -1,5 +1,5 @@
 import { API } from "@/config";
-import { lerProdutosApi, type ProdutoApi } from "@/lib/produto";
+import { lerProdutoApi, lerProdutosApi, type ProdutoApi } from "@/lib/produto";
 
 /**
  * O token fica em sessionStorage: some ao fechar a aba e nunca é enviado
@@ -92,6 +92,30 @@ export async function salvarProduto(id: number | null, dados: FormData): Promise
   await chamar(id === null ? "/api/produtos" : "/api/produtos/" + id, {
     method: id === null ? "POST" : "PUT",
     body: dados,
+  });
+}
+
+/** Marca ou desmarca "esgotado hoje" e "sabor da semana" (o servidor tira o destaque dos outros). */
+export async function alterarProduto(
+  id: number,
+  mudanca: { esgotado?: boolean; destaque?: boolean },
+): Promise<ProdutoApi> {
+  const resposta = await chamar("/api/produtos/" + id, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(mudanca),
+  });
+  const produto = lerProdutoApi(await resposta.json().catch(() => null));
+  if (!produto) throw new Error(FALHA_GENERICA);
+  return produto;
+}
+
+/** Grava a ordem do cardápio: a lista completa de ids, na ordem nova. */
+export async function reordenarProdutos(ids: number[]): Promise<void> {
+  await chamar("/api/produtos/ordem", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
   });
 }
 

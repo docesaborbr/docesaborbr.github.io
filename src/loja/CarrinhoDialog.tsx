@@ -16,6 +16,8 @@ type Props = {
   onOpenChange: (aberto: boolean) => void;
   produtos: readonly Produto[];
   carrinho: Carrinho;
+  /** sabores guardados que esgotaram hoje: ficam fora do pedido */
+  esgotados: readonly string[];
   pedidoEnviado: boolean;
   onMudar: (id: string, delta: number) => void;
   onEsvaziar: () => void;
@@ -26,7 +28,7 @@ type Props = {
 type Modo = "retirada" | "entrega" | null;
 
 export function CarrinhoDialog(props: Props) {
-  const { aberto, onOpenChange, produtos, carrinho, pedidoEnviado, onMudar, onEsvaziar, onEscolherMais } = props;
+  const { aberto, onOpenChange, produtos, carrinho, esgotados, pedidoEnviado, onMudar, onEsvaziar, onEscolherMais } = props;
   const itens = totalItens(carrinho);
 
   // Finalizar não manda direto: o pedido chegava na loja sem dizer se alguém vem
@@ -123,6 +125,15 @@ export function CarrinhoDialog(props: Props) {
           </ul>
         )}
 
+        {esgotados.length > 0 && (
+          <Alert className="mb-2 rounded-none border-0 border-l-3 border-l-dourado bg-white px-4 py-3">
+            <AlertDescription className="text-[15px] leading-[1.45] text-foreground">
+              {listarNomes(esgotados)} {esgotados.length === 1 ? "esgotou" : "esgotaram"} hoje e{" "}
+              {esgotados.length === 1 ? "ficou" : "ficaram"} fora do pedido.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {pedidoEnviado && itens === 0 && (
           <Alert className="mt-[18px] mb-1 rounded-none border-0 border-l-3 border-l-dourado px-4 py-3.5">
             <AlertDescription className="text-[15px] leading-[1.45] text-foreground">
@@ -216,6 +227,12 @@ export function CarrinhoDialog(props: Props) {
       </DialogContent>
     </Dialog>
   );
+}
+
+/** "A", "A e B", "A, B e C" */
+function listarNomes(nomes: readonly string[]): string {
+  if (nomes.length <= 1) return nomes.join("");
+  return nomes.slice(0, -1).join(", ") + " e " + nomes[nomes.length - 1];
 }
 
 function OpcaoEntrega({

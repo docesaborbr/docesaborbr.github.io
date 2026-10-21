@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { API } from "@/config";
-import { carrinhoSalvo, mudarQuantidade, reconciliar, serializar, type Carrinho } from "./carrinho";
+import {
+  carrinhoSalvo,
+  esgotadosNoCarrinho,
+  migrarDaReserva,
+  mudarQuantidade,
+  pedivel,
+  reconciliar,
+  serializar,
+  type Carrinho,
+} from "./carrinho";
 import { catalogoDaApi, RESERVA, type Produto } from "./catalogo";
 
 /**
@@ -52,7 +61,7 @@ export function useLoja() {
         const vindos = catalogoDaApi(bruto, API);
         if (!vindos) return;
         setProdutos(vindos);
-        setGuardado((atual) => reconciliar(atual, vindos));
+        setGuardado((atual) => reconciliar(migrarDaReserva(atual, RESERVA, vindos), vindos));
       })
       .catch(() => {
         /* servidor fora do ar: a lista de reserva continua valendo */
@@ -60,11 +69,12 @@ export function useLoja() {
     return () => controle.abort();
   }, []);
 
-  const carrinho = useMemo(() => reconciliar(guardado, produtos), [guardado, produtos]);
+  const carrinho = useMemo(() => pedivel(guardado, produtos), [guardado, produtos]);
+  const esgotados = useMemo(() => esgotadosNoCarrinho(guardado, produtos), [guardado, produtos]);
 
   const mudar = useCallback(
     (id: string, delta: number) => {
-      if (!produtos.some((p) => p.id === id)) return;
+      if (!produtos.some((p) => p.id === id && !p.esgotado)) return;
       if (delta > 0) setPedidoEnviado(false);
       setGuardado((atual) => mudarQuantidade(atual, id, delta));
     },
@@ -83,5 +93,5 @@ export function useLoja() {
     setPedidoEnviado(true);
   }, []);
 
-  return { produtos, carrinho, mudar, esvaziar, concluirPedido, pedidoEnviado };
+  return { produtos, carrinho, esgotados, mudar, esvaziar, concluirPedido, pedidoEnviado };
 }

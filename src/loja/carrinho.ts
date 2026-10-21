@@ -19,6 +19,45 @@ export function reconciliar(carrinho: Carrinho, produtos: readonly Produto[]): C
   return new Map([...carrinho].filter(([id]) => buscar(produtos, id)));
 }
 
+/**
+ * O que pode ir no pedido agora: existe no catálogo e não esgotou hoje. O sabor
+ * esgotado continua guardado — se o cliente voltar amanhã, ele reaparece.
+ */
+export function pedivel(carrinho: Carrinho, produtos: readonly Produto[]): Carrinho {
+  return new Map([...carrinho].filter(([id]) => buscar(produtos, id)?.esgotado === false));
+}
+
+/** Nomes dos sabores guardados no carrinho que esgotaram hoje (para avisar o cliente). */
+export function esgotadosNoCarrinho(carrinho: Carrinho, produtos: readonly Produto[]): string[] {
+  return [...carrinho.keys()].flatMap((id) => {
+    const p = buscar(produtos, id);
+    return p?.esgotado ? [p.nome] : [];
+  });
+}
+
+const comparavel = (nome: string) =>
+  nome.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+
+/**
+ * Quando a API acorda, troca no carrinho os itens da lista de reserva pelo produto
+ * de mesmo nome no catálogo real. Sem isso, quem montou o pedido enquanto o
+ * servidor acordava (até um minuto) perdia os itens sem aviso: os ids não batem.
+ */
+export function migrarDaReserva(
+  carrinho: Carrinho,
+  reserva: readonly Produto[],
+  catalogo: readonly Produto[],
+): Carrinho {
+  const idPorNome = new Map(catalogo.map((p) => [comparavel(p.nome), p.id]));
+  const migrado = new Map<string, number>();
+  for (const [id, qtd] of carrinho) {
+    const daReserva = buscar(catalogo, id) ? undefined : buscar(reserva, id);
+    const destino = (daReserva && idPorNome.get(comparavel(daReserva.nome))) ?? id;
+    migrado.set(destino, (migrado.get(destino) ?? 0) + qtd);
+  }
+  return migrado;
+}
+
 export const totalItens = (carrinho: Carrinho): number =>
   [...carrinho.values()].reduce((a, b) => a + b, 0);
 
