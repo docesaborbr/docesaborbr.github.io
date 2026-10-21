@@ -41,6 +41,33 @@ function consultar(sql, valores = []) {
   return pool.query(sql, valores);
 }
 
+/**
+ * Roda fn(cliente) numa transação. Usa um cliente só dela porque o pool.query pode
+ * mandar cada query por uma conexão diferente, e o BEGIN ficaria numa e o resto em
+ * outra. Qualquer erro desfaz tudo; o cliente sempre volta ao pool.
+ */
+async function emTransacao(fn) {
+  const cliente = await pool.connect();
+  let conexaoSuspeita = false;
+  try {
+    await cliente.query("BEGIN");
+    const resultado = await fn(cliente);
+    await cliente.query("COMMIT");
+    return resultado;
+  } catch (erro) {
+    try {
+      await cliente.query("ROLLBACK");
+    } catch {
+      // Se nem o ROLLBACK passou, a conexão pode ter ficado no meio da transação:
+      // devolvê-la ao pool faria a próxima requisição herdar esse estado.
+      conexaoSuspeita = true;
+    }
+    throw erro;
+  } finally {
+    cliente.release(conexaoSuspeita);
+  }
+}
+
 /** Cria as tabelas se ainda não existirem. Idempotente. */
 async function migrar() {
   const sql = fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8");
@@ -51,4 +78,4 @@ async function encerrar() {
   await pool.end();
 }
 
-module.exports = { consultar, migrar, encerrar, pool };
+module.exports = { consultar, emTransacao, migrar, encerrar, pool };
