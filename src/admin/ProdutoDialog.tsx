@@ -132,7 +132,7 @@ export function ProdutoDialog({ produto, onFechar, onSalvo, onSessaoExpirada }: 
             />
           </div>
           {previa && (
-            <img src={previa} alt="" className="size-[120px] rounded-md border border-dourado object-cover" />
+            <img src={previa} alt="" width={120} height={120} className="size-[120px] rounded-md border border-dourado object-cover" />
           )}
 
           {erro && (

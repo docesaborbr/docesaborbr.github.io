@@ -1,3 +1,4 @@
+import { HORARIO_LOJA, LOJA, telefoneParaLer } from "./contato";
 import { Redes } from "./Navegacao";
 
 export function Rodape() {
@@ -11,9 +12,9 @@ export function Rodape() {
             <div className="footer-col">
               <h3>FALE COM A GENTE</h3>
               <p>
-                WhatsApp (47) 99741-7610
+                WhatsApp {telefoneParaLer(LOJA.whatsapp)}
                 <br />
-                Todos os dias, das 10h às 22h
+                Todos os dias, {HORARIO_LOJA}
               </p>
             </div>
           </div>
@@ -28,9 +29,9 @@ export function Rodape() {
         <div className="pickup">
           <h3 className="pickup-title">Peça seu Doce Sabor</h3>
           <ul className="pickup-list">
-            <li>Retirada em Joinville</li>
+            <li>Retirada em {LOJA.endereco.cidade}</li>
             <li>Consulte disponibilidade de entrega</li>
-            <li>Pix • Cartão • Dinheiro</li>
+            <li>{LOJA.pagamentos.join(" • ")}</li>
           </ul>
         </div>
       </div>

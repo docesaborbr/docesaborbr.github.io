@@ -48,6 +48,8 @@ export function MenuDialog({ aberto, onOpenChange, produtos, carrinho, onMudar, 
                     src={p.img}
                     alt={"Bolo de pote sabor " + p.nome}
                     loading="lazy"
+                    width={440}
+                    height={440}
                     className="aspect-square w-full rounded-sm object-cover"
                   />
                 ) : (

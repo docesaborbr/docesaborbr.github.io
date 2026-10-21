@@ -13,6 +13,10 @@
 
 html { scroll-behavior: smooth; }
 
+/* O <picture> do componente Foto não cria caixa própria: a <img> continua sendo
+   filha direta da grade/seção, e as regras abaixo valem como antes. */
+picture { display: contents; }
+
 /* O preflight do Tailwind põe line-height 1.5 na página inteira; as medidas
    abaixo foram ajustadas com o padrão do navegador. */
 body { line-height: normal; }
@@ -145,8 +149,20 @@ body { line-height: normal; }
 .hero {
   position: relative;
   height: 718px;
-  background: #FED1D8 url("/images/hero-capa.jpg") calc(50% - 50px) center / auto 100% no-repeat;
+  background: #FED1D8;
   overflow: hidden;
+}
+/* Era fundo em CSS; virou <img> para o navegador achar a foto já no HTML e escolher
+   o tamanho certo. O posicionamento reproduz o fundo: altura toda, largura
+   proporcional, centralizada 50px à esquerda. */
+.hero-foto {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 50px);
+  height: 100%;
+  width: auto;
+  max-width: none;
+  transform: translateX(-50%);
 }
 .hero::after {
   content: "";
@@ -202,6 +218,11 @@ body { line-height: normal; }
   position: relative;
   height: 717px;
   background: #E6E6DC url("/images/flavors-potes.jpg") center / auto 100% no-repeat;
+  background-image: image-set(
+    url("/images/flavors-potes-2650.avif") type("image/avif"),
+    url("/images/flavors-potes-2650.webp") type("image/webp"),
+    url("/images/flavors-potes.jpg") type("image/jpeg")
+  );
   text-align: center;
   overflow: hidden;
 }
@@ -521,7 +542,8 @@ body { line-height: normal; }
   .nav-cart span:not(.nav-cart-count) { display: none; }
   .nav-logo { left: 50%; font-size: 26px; }
 
-  .hero { height: 78vw; max-height: 460px; background-position: center center; }
+  .hero { height: 78vw; max-height: 460px; }
+  .hero-foto { left: 50%; }
   .hero-title { top: auto; bottom: 99px; font-size: 16vw; }
   .hero-tag {
     left: 0;

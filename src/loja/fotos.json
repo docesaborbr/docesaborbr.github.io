@@ -1,0 +1,44 @@
+{
+  "hero-capa": {
+    "larguras": [750, 1100, 1250, 1500, 1900, 2690],
+    "sizes": "(max-width: 860px) min(160.5vw, 947px), (max-width: 1349px) 109.5vw, 1478px"
+  },
+  "flavors-potes": { "larguras": [2650], "sizes": "" },
+  "bolos-de-pote": {
+    "larguras": [700, 1100, 1721],
+    "sizes": "(max-width: 860px) calc(100vw - 40px), 1px"
+  },
+  "doce-pote": {
+    "larguras": [480, 800, 1308],
+    "sizes": "(max-width: 860px) 100vw, 50vw"
+  },
+  "creme-de-chocolate": {
+    "larguras": [480, 800, 1308],
+    "sizes": "(max-width: 860px) 100vw, 50vw"
+  },
+  "confeiteira": {
+    "larguras": [240, 400],
+    "sizes": "(max-width: 860px) 110px, (max-width: 1349px) 8.89vw, 120px"
+  },
+  "gallery-1": {
+    "larguras": [360, 420, 520, 690],
+    "sizes": "(max-width: 860px) 50vw, 26vw"
+  },
+  "gallery-2": {
+    "larguras": [360, 420, 520, 690],
+    "sizes": "(max-width: 860px) 50vw, 26vw"
+  },
+  "gallery-3": {
+    "larguras": [360, 420, 520, 690],
+    "sizes": "(max-width: 860px) 50vw, 26vw"
+  },
+  "gallery-4": {
+    "larguras": [360, 420, 520, 690],
+    "sizes": "(max-width: 860px) 50vw, 26vw"
+  },
+  "menu-chocolate-wafer": { "larguras": [440], "sizes": "" },
+  "menu-morango-creme": { "larguras": [440], "sizes": "" },
+  "menu-cookies": { "larguras": [440], "sizes": "" },
+  "menu-doce-de-leite": { "larguras": [440], "sizes": "" },
+  "menu-maracuja": { "larguras": [440], "sizes": "" }
+}

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --ssr src/loja/servidor.tsx && node scripts/prerenderizar.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run"
@@ -27,6 +27,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "shadcn": "^4.22.1",
+    "sharp": "^0.33.5",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",

@@ -14,11 +14,11 @@ export type Produto = {
  * dados reais assim que chegarem.
  */
 export const RESERVA: Produto[] = [
-  { id: "chocolate-wafer", nome: "Chocolate com wafer", preco: 16, img: "/images/menu-chocolate-wafer.jpg" },
-  { id: "morango-creme", nome: "Morango com creme", preco: 15, img: "/images/menu-morango-creme.jpg" },
-  { id: "cookies", nome: "Cookies com chocolate", preco: 17, img: "/images/menu-cookies.jpg" },
-  { id: "doce-de-leite", nome: "Doce de leite com brigadeiro", preco: 17, img: "/images/menu-doce-de-leite.jpg" },
-  { id: "maracuja", nome: "Maracujá com chocolate branco", preco: 18, img: "/images/menu-maracuja.jpg" },
+  { id: "chocolate-wafer", nome: "Chocolate com wafer", preco: 16, img: "/images/menu-chocolate-wafer-440.webp" },
+  { id: "morango-creme", nome: "Morango com creme", preco: 15, img: "/images/menu-morango-creme-440.webp" },
+  { id: "cookies", nome: "Cookies com chocolate", preco: 17, img: "/images/menu-cookies-440.webp" },
+  { id: "doce-de-leite", nome: "Doce de leite com brigadeiro", preco: 17, img: "/images/menu-doce-de-leite-440.webp" },
+  { id: "maracuja", nome: "Maracujá com chocolate branco", preco: 18, img: "/images/menu-maracuja-440.webp" },
 ];
 
 /** Converte a resposta da API para o catálogo da loja. Lista vazia ou inválida devolve null. */

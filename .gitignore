@@ -10,6 +10,7 @@ desktop.ini
 # Dependências e build (caso o projeto cresça)
 node_modules/
 dist/
+dist-ssr/
 
 # Segredos — nunca versionar
 .env

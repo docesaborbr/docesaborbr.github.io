@@ -10,7 +10,28 @@
    modo escuro do sistema e mudaria a cor dos campos para quem usa celular no escuro. */
 @custom-variant dark (&:is(.dark *));
 
-/* As fontes vêm do Google Fonts, no <head> de cada página. */
+/* Fontes hospedadas no próprio site (public/fonts), só com o que a página usa:
+   a Fraunces já vem com SOFT 80 e WONK 1 aplicados e pesos de 400 a 700, o que
+   corta o arquivo pela metade. Servir daqui evita uma conexão a mais no carregamento
+   e não manda o IP de quem visita para o Google. Pré-carregadas no <head>. */
+@font-face {
+    font-family: "Fraunces";
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url("/fonts/fraunces-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400 600;
+    font-display: swap;
+    src: url("/fonts/inter-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @theme inline {
     --font-sans: "Inter", Helvetica, Arial, sans-serif;
     --font-serif: "Fraunces", Georgia, "Times New Roman", serif;

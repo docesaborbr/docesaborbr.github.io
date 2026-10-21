@@ -151,7 +151,7 @@ function LinhaProduto({
     <Card className="grid grid-cols-[64px_1fr_110px_auto] items-center gap-[18px] rounded-md px-[18px] py-3.5 ring-0 celular:grid-cols-[56px_1fr] celular:gap-y-2.5">
       <div className="size-16 overflow-hidden rounded-sm celular:size-14">
         {imagem ? (
-          <img src={imagem} alt="" loading="lazy" className="size-full object-cover" />
+          <img src={imagem} alt="" loading="lazy" width={64} height={64} className="size-full object-cover" />
         ) : (
           <div className="flex size-full items-center justify-center bg-rosa text-center text-[11px] opacity-70">
             sem foto

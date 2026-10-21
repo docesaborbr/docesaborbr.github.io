@@ -26,13 +26,22 @@ function gravar(carrinho: Carrinho): void {
   }
 }
 
+/** Estado antes de ler o que está salvo. Gravá-lo apagaria o carrinho guardado. */
+const AINDA_NAO_LIDO: Carrinho = new Map();
+
 export function useLoja() {
   const [produtos, setProdutos] = useState<Produto[]>(RESERVA);
-  // o que está salvo, inclusive itens que o catálogo atual ainda não confirmou
-  const [guardado, setGuardado] = useState<Carrinho>(() => carrinhoSalvo(lerArmazenado()));
+  // O que está salvo, inclusive itens que o catálogo atual ainda não confirmou.
+  // Começa vazio também no navegador: a página chega renderizada do build, e o
+  // primeiro render precisa bater com aquele HTML. O salvo entra logo em seguida.
+  const [guardado, setGuardado] = useState<Carrinho>(AINDA_NAO_LIDO);
   const [pedidoEnviado, setPedidoEnviado] = useState(false);
 
-  useEffect(() => gravar(guardado), [guardado]);
+  useEffect(() => setGuardado(carrinhoSalvo(lerArmazenado())), []);
+
+  useEffect(() => {
+    if (guardado !== AINDA_NAO_LIDO) gravar(guardado);
+  }, [guardado]);
 
   // Busca o catálogo na API. Se falhar, a loja segue com a lista de reserva.
   useEffect(() => {

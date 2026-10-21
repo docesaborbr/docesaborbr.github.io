@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ENDERECO_LOJA } from "./contato";
+import { CIDADE_LOJA, ENDERECO_LOJA, HORARIO_LOJA } from "./contato";
+import { Foto } from "./Foto";
 
 type AbreMenu = { onAbrirMenu: () => void };
 
@@ -18,6 +19,8 @@ function BotaoPedido({ onAbrirMenu, variant = "default" }: AbreMenu & { variant?
 export function Hero() {
   return (
     <section className="hero">
+      {/* é a maior imagem da primeira tela (o LCP): sem lazy e com prioridade alta */}
+      <Foto nome="hero-capa" className="hero-foto" alt="" width={2690} height={1307} fetchPriority="high" />
       <div className="hero-inner">
         <h1 className="hero-title">Bolo de Pote</h1>
         <p className="hero-tag">Feito artesanalmente</p>
@@ -34,10 +37,12 @@ export function Sabores({ onAbrirMenu }: AbreMenu) {
     <section className="flavors" id="sabores">
       <p className="eyebrow">Fresco e saboroso!</p>
       <h2 className="display">Nossos Sabores</h2>
-      <img
+      <Foto
+        nome="bolos-de-pote"
         className="flavors-cups"
         loading="lazy"
-        src="/images/bolos-de-pote.jpg"
+        width={1721}
+        height={914}
         alt="Cinco bolos de pote vistos de cima: chocolate com wafer, morango com creme, cookies com chocolate, doce de leite com brigadeiro e maracujá com chocolate branco"
       />
       <Button size="lg" className="flavors-btn" onClick={onAbrirMenu}>
@@ -56,8 +61,11 @@ export function MelhorBolo({ onAbrirMenu }: AbreMenu) {
         <BotaoPedido onAbrirMenu={onAbrirMenu} />
       </div>
       <div className="split-photo">
-        <img
-          src="/images/doce-pote.jpg"
+        <Foto
+          nome="doce-pote"
+          loading="lazy"
+          width={1308}
+          height={1202}
           alt="Mão segurando um bolo de pote Doce Sabor de chocolate, com granulado e morango por cima"
         />
       </div>
@@ -73,7 +81,7 @@ export function SobreNos() {
       <div className="split-text">
         <p className="eyebrow">Nossa História</p>
         <h2 className="display">Sobre Nós</h2>
-        <img className="about-avatar" src="/images/confeiteira.jpg" alt="Foto da confeiteira" width={400} height={400} />
+        <Foto nome="confeiteira" className="about-avatar" loading="lazy" alt="Foto da confeiteira" width={400} height={400} />
         <div className="about-text">
           <p>
             Natural de São Bento do Sul, aos 44 anos, ela reúne 15 anos de experiência na área de confeitaria e
@@ -105,7 +113,7 @@ export function SobreNos() {
         </Button>
       </div>
       <div className="split-photo">
-        <img src="/images/creme-de-chocolate.jpg" alt="Calda de chocolate com raspas" />
+        <Foto nome="creme-de-chocolate" loading="lazy" width={1308} height={1203} alt="Calda de chocolate com raspas" />
       </div>
     </section>
   );
@@ -123,7 +131,7 @@ export function Entregamos({ onAbrirMenu }: AbreMenu) {
           <p>
             {ENDERECO_LOJA}
             <br />
-            Joinville, SC · 89201-000
+            {CIDADE_LOJA}
           </p>
         </div>
         <div className="delivery-bloco">
@@ -131,7 +139,7 @@ export function Entregamos({ onAbrirMenu }: AbreMenu) {
           <p>
             Todos os dias
             <br />
-            das 10h às 22h
+            {HORARIO_LOJA}
           </p>
         </div>
         <div className="delivery-bloco">
@@ -152,10 +160,10 @@ export function Entregamos({ onAbrirMenu }: AbreMenu) {
 export function Galeria() {
   return (
     <section className="gallery">
-      <img loading="lazy" src="/images/gallery-1.jpg" alt="Bolo de pote com rótulo Doce Sabor segurado na mão" />
-      <img loading="lazy" src="/images/gallery-2.jpg" alt="Bolo de pote de chocolate com morangos e raspas, visto de perto" />
-      <img loading="lazy" src="/images/gallery-3.jpg" alt="Bolos de pote de morango com creme e de cookies, vistos de cima" />
-      <img loading="lazy" src="/images/gallery-4.jpg" alt="Bolos de pote de doce de leite com brigadeiro e de maracujá, vistos de cima" />
+      <Foto nome="gallery-1" loading="lazy" width={690} height={686} alt="Bolo de pote com rótulo Doce Sabor segurado na mão" />
+      <Foto nome="gallery-2" loading="lazy" width={690} height={686} alt="Bolo de pote de chocolate com morangos e raspas, visto de perto" />
+      <Foto nome="gallery-3" loading="lazy" width={690} height={686} alt="Bolos de pote de morango com creme e de cookies, vistos de cima" />
+      <Foto nome="gallery-4" loading="lazy" width={690} height={686} alt="Bolos de pote de doce de leite com brigadeiro e de maracujá, vistos de cima" />
     </section>
   );
 }
