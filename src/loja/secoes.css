@@ -14,8 +14,11 @@
 html { scroll-behavior: smooth; }
 
 /* O <picture> do componente Foto não cria caixa própria: a <img> continua sendo
-   filha direta da grade/seção, e as regras abaixo valem como antes. */
+   filha direta da grade/seção, e as regras abaixo valem como antes. Os <source>
+   também sobem para a grade e, sem o display:none, cada um ocupava uma casa —
+   a galeria virava uma escada que vazava abaixo do rodapé. */
 picture { display: contents; }
+picture > source { display: none; }
 
 /* O preflight do Tailwind põe line-height 1.5 na página inteira; as medidas
    abaixo foram ajustadas com o padrão do navegador. */
